@@ -5,8 +5,8 @@
  *      Author: tooka
  */
 
-#ifndef INC_STACK_H_
-#define INC_STACK_H_
+#ifndef INC_TASKER_H_
+#define INC_TASKER_H_
 
 enum taskStateTypes {
 	READY,
@@ -35,9 +35,10 @@ void createTask(uint32_t stackSizeInWords, void * taskFunction, enum taskStateTy
 int assemblyAdd(int a, int b);
 void schedulerComputeTaskState(void);
 void schedulerCompute(void);
+void taskDelay(uint32_t ticks);
 void taskOne(void);
 void taskTwo(void);
 void taskThree(void);
 
 
-#endif /* INC_STACK_H_ */
+#endif /* INC_TASKER_H_ */

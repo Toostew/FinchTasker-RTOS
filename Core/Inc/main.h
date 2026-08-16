@@ -36,7 +36,7 @@ extern "C" {
 #include <stdio.h>
 
 #include "config.h"
-#include "stack.h"
+#include "tasker.h"
 #include "debugHelp.h"
 #include "stdlib.h"
 #include "string.h"
