@@ -12,7 +12,7 @@ void systick_config(){
 	SysTick->CTRL &= ~((1 << 2) | (1 << 1) | (1 << 0));
 	SysTick->CTRL |= ((1 << 2) | (1 << 1)); //CLKSOURCE, TICKINT
 
-	SysTick->LOAD = 1699999; //(period seconds - frequency) - 1, (10ms (0.01) x 170MHZ) - 1
+	SysTick->LOAD = 1699999; //(clock frequency(hz) x desired delay(seconds)) - 1 = (170,000,000 x 0.001)
 	SysTick->VAL = 0; //read VAL once to reset VAL to 0
 }
 

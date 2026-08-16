@@ -253,9 +253,10 @@ void PendSV_Handler(void)  //this macro declares that this function is naked, as
 	 );
 }
 
-/**
-  * @brief This function handles System tick timer.
-  */
+//we don't perform anything huge inside systick handler because it has a VERY high priority
+//the whole point of a context switch is so that it can run when nothing important needs CPU time
+//Hence, ideally we keep it a pyramid layout; wherein lower priority interrupts do the heavy lifting (so they can be interrupted)
+//higher priority interrupts get very easy and lightweight tasks
 void SysTick_Handler(void)
 {
 	SCB->ICSR |= (1 << 28); //fire pendSV

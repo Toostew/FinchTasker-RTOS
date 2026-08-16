@@ -82,6 +82,7 @@ void schedulerConfig(TransferControlBlock_def * firstTask, TransferControlBlock_
 
 
 //this function figures out who's up next, using round robin (simple)
+//when it is invoked from pendSV, currentTask will already contain
 //on first run 1 has already been computed as the next task
 //initially we just swap current and nextTask, which we compute for the next invokation of schedulerCompute
 //to allow blocking to occur we now need to check the task state before moving on
@@ -90,16 +91,26 @@ void schedulerCompute(void){
 	//the first task that is ready will be swapped and done
 	//if none of the tasks are free it switches to an idle tasks that is always ready
 
-	do{
-		if(transferControlBlockList[transferControlBlockListIndex]->taskState == READY){
+	//check every single item
+	currentTask->taskState = READY; //set ready
+	//this will run 4 times instead of 5 since i is set to 1
+	for(int i = 1; i < transferControlBlockListLength; i++){
+		transferControlBlockListNextIndex++;
+		if(transferControlBlockListNextIndex >= transferControlBlockListLength){
+			transferControlBlockListNextIndex = 0; //reset to 0
+		}
+		if(transferControlBlockList[transferControlBlockListNextIndex]->taskState == READY){
+			//found a ready task
+
+
+			nextTask = transferControlBlockList[transferControlBlockListNextIndex];
+			currentTask = nextTask;
+			nextTask->taskState = RUNNING;
+			break; //terminate early
 
 		}
-	}while(transferControlBlockListNextIndex < transferControlBlockListLength);
-
-	//past this point, it terminated from the do while loop either:
-	//1. there was no task that was READY
-	//2. It was the last valid element
-	//3.
+	}
+	//the for loop terminates automatically if it could not find another task despite checking them all
 
 
 
@@ -131,6 +142,29 @@ void schedulerCompute(void){
 		case 4:
 			taskFourRuns++;
 			break;
+	}
+}
+
+//this function will go through the ENTIRE list of tasks, check if their wakeCount has been exceeded by the tick count.
+//if yes, promote from blocked to ready again
+void schedulerComputeTaskState(){
+	for(int i = 0; i < transferControlBlockListLength; i++){
+		if(transferControlBlockList[i]->taskState == WAITING_DELAY){
+
+			//check if the OSTickCount exceed or equal wakeTick
+			//if yes, set the task state to READY
+			//instead of directly comparing wakeTick <= OSTickCount, we can subtract them, and see if <= 0
+			//this is better since if either overflows it's 32 bit register, it will loop back.
+			//by minusing we reduce the chance of errors happening during an overflow
+			//keep in mind at 1ms tickrate, 32-bit register will overflow in 49 days
+			//we use signed int because we will deal with negatives, if we used uint negatives would overflow and wrap forwards
+			if((int32_t)(transferControlBlockList[i]->wakeTick - OSTickCount) <= 0){
+				transferControlBlockList[i]->taskState = READY;
+			}
+
+		} else if (transferControlBlockList[i]->taskState == WAITING_SEMAPHORE){
+			//thi handles the semaphore condition
+		}
 	}
 }
 
@@ -173,7 +207,7 @@ void createTask(uint32_t stackSizeInWords, void * taskFunction, enum taskStateTy
 	//add to the TCB list
 	transferControlBlockList[transferControlBlockListIndex] = task;
 	transferControlBlockListIndex++; //once this fill completely, this becomes the index of the last element, assuming it doesnt overflow out
-
+	//and conveniently, also the number of tasks currently registered
 
 }
 

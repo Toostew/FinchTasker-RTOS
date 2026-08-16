@@ -70,7 +70,7 @@ static void MX_GPIO_Init(void);
 TransferControlBlock_def * transferControlBlockList[transferControlBlockListLength];
 uint16_t transferControlBlockListIndex = 0; //start at beginning
 uint16_t transferControlBlockListNextIndex = 1; //the first task to be added is ALWAYS the current task on first run
-
+uint32_t OSTickCount = 0;
 
 
 TransferControlBlock_def * currentTask;

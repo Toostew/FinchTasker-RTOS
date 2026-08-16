@@ -53,6 +53,7 @@ extern TransferControlBlock_def * nextTask;
 extern TransferControlBlock_def * transferControlBlockList[];
 extern uint16_t transferControlBlockListIndex; //use this value to populate the array
 extern uint16_t transferControlBlockListNextIndex;
+extern uint32_t OSTickCount; //this is the OS level tick counter, used for sync in delays
 
 //global variable counts, for test
 extern int taskZeroRuns;
