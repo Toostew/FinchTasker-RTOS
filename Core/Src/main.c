@@ -140,11 +140,11 @@ int main(void)
 
 
 
-  createTask(512, &taskOne); //taskZero
-  createTask(256, &taskTwo); //taskOne
-  createTask(128, &taskThree); //taskTwo
-  createTask(128, &taskTwo); //taskThree
-  createTask(128, &taskThree); //taskFour
+  createTask(512, &taskOne, READY); //taskZero
+  createTask(256, &taskTwo, READY); //taskOne
+  createTask(128, &taskThree, READY); //taskTwo
+  createTask(128, &taskTwo, READY); //taskThree
+  createTask(128, &taskThree, READY); //taskFour
 
   schedulerConfig(transferControlBlockList[0], transferControlBlockList[1]);
 

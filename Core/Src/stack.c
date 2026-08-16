@@ -83,8 +83,27 @@ void schedulerConfig(TransferControlBlock_def * firstTask, TransferControlBlock_
 
 //this function figures out who's up next, using round robin (simple)
 //on first run 1 has already been computed as the next task
+//initially we just swap current and nextTask, which we compute for the next invokation of schedulerCompute
+//to allow blocking to occur we now need to check the task state before moving on
 void schedulerCompute(void){
-	//do swap first, then check values
+	//we will check who in the list isn't blocked or waiting
+	//the first task that is ready will be swapped and done
+	//if none of the tasks are free it switches to an idle tasks that is always ready
+
+	do{
+		if(transferControlBlockList[transferControlBlockListIndex]->taskState == READY){
+
+		}
+	}while(transferControlBlockListNextIndex < transferControlBlockListLength);
+
+	//past this point, it terminated from the do while loop either:
+	//1. there was no task that was READY
+	//2. It was the last valid element
+	//3.
+
+
+
+	/*
 	currentTask = nextTask;
 
 	transferControlBlockListNextIndex++;
@@ -93,7 +112,9 @@ void schedulerCompute(void){
 		transferControlBlockListNextIndex = 0; //reset to 0
 	}
 	nextTask = transferControlBlockList[transferControlBlockListNextIndex];
+	*/
 
+	//count the number each task runs for debug
 	switch(transferControlBlockListNextIndex){
 		case 0:
 			taskZeroRuns++;
@@ -102,7 +123,7 @@ void schedulerCompute(void){
 			taskOneRuns++;
 			break;
 		case 2:
-			taskTwoRuns;
+			taskTwoRuns++;
 			break;
 		case 3:
 			taskThreeRuns++;
@@ -120,7 +141,7 @@ void schedulerCompute(void){
 
 
 //creates task for you
-void createTask(uint32_t stackSizeInWords, void * taskFunction){
+void createTask(uint32_t stackSizeInWords, void * taskFunction, enum taskStateTypes taskState){
 	uint32_t * stackRegion = (uint32_t *)malloc(stackSizeInWords * sizeof(uint32_t));
 
 	if(stackRegion == NULL){
@@ -140,13 +161,14 @@ void createTask(uint32_t stackSizeInWords, void * taskFunction){
 	  }
 
 	  //create the TCB with malloc
-	  //(remember: local variables are destroyed on function termination)
+	  //(remember: local variables are destroyed on function termination, malloc allocates memory in the heap)
 	  TransferControlBlock_def * task = (TransferControlBlock_def *)malloc(sizeof(TransferControlBlock_def));
 
-	  task->basePointer = stackRegion;
 	  task->stackPointer = (uint32_t *)fakeStackPointer;
+	  task->basePointer = stackRegion;
 	  task->topOfStackPointer = (uint32_t *)topOfTask_Stack;
 	  task->taskFunction = (uint32_t *)taskFunction;
+	  task->taskState = taskState; //actually come to think of it you could just default to ready on task creation, but hey leave the door open
 
 	//add to the TCB list
 	transferControlBlockList[transferControlBlockListIndex] = task;
