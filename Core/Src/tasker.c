@@ -66,12 +66,42 @@ void psp_switchConfig(uint32_t * taskStack, uint32_t sizeOfStack){
 
 //this is the separate config function to set the first task into sequence
 //we do not set control here ourselves, we'll do this in the supervisor call with arm assembly
-void schedulerConfig(TransferControlBlock_def * firstTask, TransferControlBlock_def * secondTask ){
+void schedulerConfig(TransferControlBlock_def * firstTask, TransferControlBlock_def * secondTask,
+		void * idleTaskFunction){
 
 		//set the first and second tasks as current and next
 	  currentTask = firstTask;
 	  nextTask = secondTask;
 
+	  { //this creates the idleTask; it's a special global so we need to do it here
+		uint32_t * stackRegion = (uint32_t *)malloc(256 * sizeof(uint32_t));
+
+		if(stackRegion == NULL){
+			return;
+		}
+		memset(stackRegion, 0, (256 * sizeof(uint32_t))); //set every byte to 0
+		uint32_t topOfTask_Stack = ((uint32_t)(stackRegion) + (256 * sizeof(uint32_t)));
+		uint32_t fakeStackPointer = ((uint32_t)(topOfTask_Stack) - 64);
+
+		*(uint32_t *)((uint8_t *)fakeStackPointer + 0x3C) = 0x01000000; //xPSR, offset by 60 bytes, not 64 since technically topofTaskStack is 4 bytes (1 element) out
+		*(uint32_t *)((uint8_t *)fakeStackPointer + 0x38) = (uint32_t)idleTaskFunction; //PC
+
+
+
+
+		//create the TCB with malloc
+		//(remember: local variables are destroyed on function termination, malloc allocates memory in the heap)
+		TransferControlBlock_def * task = (TransferControlBlock_def *)malloc(sizeof(TransferControlBlock_def));
+
+		task->stackPointer = (uint32_t *)fakeStackPointer;
+		task->basePointer = stackRegion;
+		task->topOfStackPointer = (uint32_t *)topOfTask_Stack;
+		task->taskFunction = (uint32_t *)idleTaskFunction;
+		task->taskState = READY; //since it is idle it will ALWAYS be ready
+
+
+		  idleTask = task;
+	  }
 	  __set_PSP((uint32_t)firstTask->topOfStackPointer);
 
 
@@ -87,14 +117,20 @@ void schedulerConfig(TransferControlBlock_def * firstTask, TransferControlBlock_
 //initially we just swap current and nextTask, which we compute for the next invokation of schedulerCompute
 //to allow blocking to occur we now need to check the task state before moving on
 void schedulerCompute(void){
+	uint8_t candidateFound = 0;
 	//we will check who in the list isn't blocked or waiting
 	//the first task that is ready will be swapped and done
 	//if none of the tasks are free it switches to an idle tasks that is always ready
 
 	//check every single item
-	currentTask->taskState = READY; //set ready
-	//this will run 4 times instead of 5 since i is set to 1
-	for(int i = 1; i < transferControlBlockListLength; i++){
+	//check the currently running task, if it's state is anything other than RUNNING, do not set to ready
+	if(currentTask->taskState == RUNNING){
+		currentTask->taskState = READY; //set ready
+	}
+	//if the taskstate is WAITING, then we must not allow it to be promoted to READY or else it will invalidate the delay
+
+	//this will run the length of the TCB list
+	for(int i = 0; i < transferControlBlockListLength; i++){
 		transferControlBlockListNextIndex++;
 		if(transferControlBlockListNextIndex >= transferControlBlockListLength){
 			transferControlBlockListNextIndex = 0; //reset to 0
@@ -106,12 +142,19 @@ void schedulerCompute(void){
 			nextTask = transferControlBlockList[transferControlBlockListNextIndex];
 			currentTask = nextTask;
 			nextTask->taskState = RUNNING;
+			candidateFound = 1;
 			break; //terminate early
 
 		}
 	}
 	//the for loop terminates automatically if it could not find another task despite checking them all
+	//we will check the candidateFound flag to see if the for loop terminated with or without a candidate task
+	if(!candidateFound){
+		nextTask = idleTask;
+		currentTask = nextTask;
+		currentTask->taskState = RUNNING;
 
+	}
 
 
 	/*
@@ -211,6 +254,17 @@ void createTask(uint32_t stackSizeInWords, void * taskFunction, enum taskStateTy
 
 }
 
+//this function, when invoked, delays execution of whatever task that calls it for the set number of ticks
+//called inside the task function
+void taskDelay(uint32_t ticks){
+	currentTask->wakeTick = OSTickCount + ticks;
+	currentTask->taskState = WAITING_DELAY;
+
+	//manually fire pendSV
+	SCB->ICSR |= (1 << 28); //fire pendSV
+}
+
+
 //empty for test
 void taskOne(void){
 	while(1){
@@ -227,6 +281,12 @@ void taskTwo(void){
 void taskThree(){
 	while(1){
 		toggleBlink(2);
+	}
+}
+
+void idleTaskFunction(void){
+	while(1){
+
 	}
 }
 

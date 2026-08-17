@@ -30,7 +30,7 @@ typedef struct {
 
 
 void psp_switchConfig(uint32_t * taskStack, uint32_t sizeOfStack);
-void schedulerConfig(TransferControlBlock_def * firstTask, TransferControlBlock_def * secondTask);
+void schedulerConfig(TransferControlBlock_def * firstTask, TransferControlBlock_def * secondTask, void * idleTaskFunction);
 void createTask(uint32_t stackSizeInWords, void * taskFunction, enum taskStateTypes taskState);
 int assemblyAdd(int a, int b);
 void schedulerComputeTaskState(void);
@@ -39,6 +39,7 @@ void taskDelay(uint32_t ticks);
 void taskOne(void);
 void taskTwo(void);
 void taskThree(void);
+void idleTaskFunction(void);
 
 
 #endif /* INC_TASKER_H_ */

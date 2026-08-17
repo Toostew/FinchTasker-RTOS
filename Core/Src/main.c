@@ -75,6 +75,7 @@ uint32_t OSTickCount = 0;
 
 TransferControlBlock_def * currentTask;
 TransferControlBlock_def * nextTask;
+TransferControlBlock_def * idleTask;
 
 int taskZeroRuns = 0;
 int taskOneRuns = 0;
@@ -146,7 +147,8 @@ int main(void)
   createTask(128, &taskTwo, READY); //taskThree
   createTask(128, &taskThree, READY); //taskFour
 
-  schedulerConfig(transferControlBlockList[0], transferControlBlockList[1]);
+  //this will set currentTask, NextTask, and the idleTask globals
+  schedulerConfig(transferControlBlockList[0], transferControlBlockList[1], (void *)idleTaskFunction);
 
   systick_toggle(1);
   //invoke SVC

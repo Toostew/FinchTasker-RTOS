@@ -49,6 +49,7 @@ extern TransferControlBlock_def SecondTCB;
 
 extern TransferControlBlock_def * currentTask;
 extern TransferControlBlock_def * nextTask;
+extern TransferControlBlock_def * idleTask;
 
 extern TransferControlBlock_def * transferControlBlockList[];
 extern uint16_t transferControlBlockListIndex; //use this value to populate the array
