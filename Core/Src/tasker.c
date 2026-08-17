@@ -73,7 +73,7 @@ void schedulerConfig(TransferControlBlock_def * firstTask, TransferControlBlock_
 	  currentTask = firstTask;
 	  nextTask = secondTask;
 
-	  { //this creates the idleTask; it's a special global so we need to do it here
+	  //this creates the idleTask; it's a special global so we need to do it here
 		uint32_t * stackRegion = (uint32_t *)malloc(256 * sizeof(uint32_t));
 
 		if(stackRegion == NULL){
@@ -101,7 +101,7 @@ void schedulerConfig(TransferControlBlock_def * firstTask, TransferControlBlock_
 
 
 		  idleTask = task;
-	  }
+
 	  __set_PSP((uint32_t)firstTask->topOfStackPointer);
 
 
@@ -117,6 +117,11 @@ void schedulerConfig(TransferControlBlock_def * firstTask, TransferControlBlock_
 //initially we just swap current and nextTask, which we compute for the next invokation of schedulerCompute
 //to allow blocking to occur we now need to check the task state before moving on
 void schedulerCompute(void){
+	OSTickCount++;
+	//compute the task states of all tasks that are WAITING
+	//determines if currently waiting tasks can be promoted to READY
+	schedulerComputeTaskState();
+
 	uint8_t candidateFound = 0;
 	//we will check who in the list isn't blocked or waiting
 	//the first task that is ready will be swapped and done
@@ -167,7 +172,7 @@ void schedulerCompute(void){
 	}
 	nextTask = transferControlBlockList[transferControlBlockListNextIndex];
 	*/
-
+	/*
 	//count the number each task runs for debug
 	switch(transferControlBlockListNextIndex){
 		case 0:
@@ -186,6 +191,7 @@ void schedulerCompute(void){
 			taskFourRuns++;
 			break;
 	}
+	*/
 }
 
 //this function will go through the ENTIRE list of tasks, check if their wakeCount has been exceeded by the tick count.
@@ -265,22 +271,29 @@ void taskDelay(uint32_t ticks){
 }
 
 
-//empty for test
+//PB1, far right
 void taskOne(void){
 	while(1){
+		taskOneRuns++;
 		toggleBlink(0);
+
 	}
 }
-//empty for test
+//PB4, far left
 void taskTwo(void){
 	  while(1){
+		  taskTwoRuns++;
 		  toggleBlink(1);
+		  taskDelay(1000);
 	  }
 }
 
+//PB5, middle
 void taskThree(){
 	while(1){
+		taskThreeRuns++;
 		toggleBlink(2);
+		taskDelay(1000);
 	}
 }
 

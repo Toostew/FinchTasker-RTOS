@@ -214,6 +214,8 @@ void PendSV_Handler(void)  //this macro declares that this function is naked, as
 	 );
 } */
 
+
+//Context Switch is split between STORE and LOAD. we STORE the current task state into memory, then LOAD the next task's state into the CPU regs
 void PendSV_Handler(void)  //this macro declares that this function is naked, as in, C will not treat it normally, and will not generate function entry and exit code. As a consequence, we must write the body in assembly
 {
 	 __asm__ volatile (
