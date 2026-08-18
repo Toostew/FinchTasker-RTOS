@@ -271,12 +271,13 @@ void taskDelay(uint32_t ticks){
 }
 
 
+
 //PB1, far right
 void taskOne(void){
 	while(1){
 		taskOneRuns++;
 		toggleBlink(0);
-
+		taskDelay(500);
 	}
 }
 //PB4, far left

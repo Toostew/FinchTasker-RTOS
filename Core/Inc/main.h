@@ -38,6 +38,8 @@ extern "C" {
 #include "config.h"
 #include "tasker.h"
 #include "debugHelp.h"
+#include "semaphore.h"
+
 #include "stdlib.h"
 #include "string.h"
 
