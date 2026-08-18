@@ -212,7 +212,7 @@ void schedulerComputeTaskState(){
 			}
 
 		} else if (transferControlBlockList[i]->taskState == WAITING_SEMAPHORE){
-			//thi handles the semaphore condition
+			//this handles the semaphore condition, check to see if tasks waiting on semaphore can now run
 		}
 	}
 }
