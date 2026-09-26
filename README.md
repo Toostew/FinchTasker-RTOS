@@ -58,9 +58,9 @@ Now, another thing to understand is that memory is grouped into 2 types: **stack
 In the TCB above, we store 3 different pointers to the stack: `stackPointer`, which is the pointer to the next free address within the stack to be used; the `basePointer`, which points to the base of the stack; and the `topOfStackPointer`, which points to the top of the stack. Understand that the stack region is bounded by the `topOfStackPointer` down to the `basePointer`   stack memory grows downward starting from the top of the stack to the base.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/aad85a07-d153-497a-9f53-55402b75d401" title="Hover text here" width="400">
+  <img src="https://github.com/user-attachments/assets/aad85a07-d153-497a-9f53-55402b75d401" title="Stack memory growth" width="50%">
   <br>
-  <sub>Figure 1: The official mascot for FinchRTOS.</sub>
+  <sub>The Stack grows downward, starting from a high address and ending on a lower address.</sub>
 </p>
 
 ### Creating a Task
