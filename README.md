@@ -13,9 +13,9 @@ Now, there are a few distinct types of OSes. The one most relevant to us right n
 With that in mind, let me introduce you to my latest project, an RTOS kernel for the STM32G474RE, which I've called **FinchRTOS**, after Finches (because I like Finches).
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/5e5287ff-e12c-4c57-a973-03b39f8bed29" title="Stack growing downwards" width="80%">
+  <img src="https://github.com/user-attachments/assets/5e5287ff-e12c-4c57-a973-03b39f8bed29" title="finch" width="80%">
   <br>
-  <sub>Stack memory grows downwards, from a high starting address</sub>
+  <sub>Finches are easily in the top 10 birds ever</sub>
 </p>
 
 
