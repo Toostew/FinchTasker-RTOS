@@ -6,6 +6,14 @@
  */
 #include "main.h"
 
+/*COMPLETED AUG 18 2026
+ * Work for the future:
+ * -change the wait list to an array, rather than just 1 pointer to 1 task TCB
+ *
+ *
+ * */
+
+
 
 //create a semaphore, add it to global list of semaphores, return pointer to said semaphore struct
 semaphoreBinary_def * semaphoreCreate(){

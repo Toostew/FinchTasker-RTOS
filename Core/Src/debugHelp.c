@@ -11,7 +11,7 @@ void blinkConfig(){
 
 	RCC->AHB2ENR |= (1 << 1); //enable AHB2 for GPIOB
 	GPIOB->MODER &= ~((0b11 << 2) | (0b11 << 8) | (0b11 << 10)); //2 bit region
-	GPIOB->MODER |= ((1 << 2) | (1 << 8) | (1 << 10)); //set mode to GP output
+	GPIOB->MODER |= ((1 << 2) | (1 << 4) | (1 << 8) | (1 << 10)); //set mode to GP output
 }
 
 void setResetBlink(int setReset){

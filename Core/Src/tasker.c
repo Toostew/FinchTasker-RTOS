@@ -93,6 +93,9 @@ void schedulerConfig(TransferControlBlock_def * firstTask, TransferControlBlock_
 		//(remember: local variables are destroyed on function termination, malloc allocates memory in the heap)
 		TransferControlBlock_def * task = (TransferControlBlock_def *)malloc(sizeof(TransferControlBlock_def));
 
+
+
+		//this is the creation of the idle task, which is a special task not found within the task list
 		task->stackPointer = (uint32_t *)fakeStackPointer;
 		task->basePointer = stackRegion;
 		task->topOfStackPointer = (uint32_t *)topOfTask_Stack;
@@ -262,6 +265,7 @@ void createTask(uint32_t stackSizeInWords, void * taskFunction, enum taskStateTy
 
 //this function, when invoked, delays execution of whatever task that calls it for the set number of ticks
 //called inside the task function
+//as set in config.c, systick fires every 1 ms
 void taskDelay(uint32_t ticks){
 	currentTask->wakeTick = OSTickCount + ticks;
 	currentTask->taskState = WAITING_DELAY;
@@ -277,7 +281,7 @@ void taskOne(void){
 	while(1){
 		taskOneRuns++;
 		toggleBlink(0);
-		taskDelay(500);
+		taskDelay(100);
 	}
 }
 //PB4, far left
@@ -285,7 +289,7 @@ void taskTwo(void){
 	  while(1){
 		  taskTwoRuns++;
 		  toggleBlink(1);
-		  taskDelay(1000);
+		  taskDelay(200);
 	  }
 }
 

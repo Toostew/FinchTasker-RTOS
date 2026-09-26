@@ -145,7 +145,7 @@ void UsageFault_Handler(void)
 //SuperVisor Call
 void SVC_Handler(void)
 {
-	//we need to return an EXTI_RETURN value of 0xFFFFFFFD,
+	//we need to return an EXC_RETURN value of 0xFFFFFFFD,
 	//returns to thread mode, non-FPU, from PSP, uses PSP on return
 
 	__asm__ volatile (

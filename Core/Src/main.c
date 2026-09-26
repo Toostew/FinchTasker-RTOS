@@ -137,6 +137,9 @@ int main(void)
 
   blinkConfig();
 
+  GPIOB->BSRR = (1 << 2);
+  GPIOB->BSRR = (1 << 1);
+
   systick_config();
 
 
